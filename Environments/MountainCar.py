@@ -89,3 +89,13 @@ class MountainCar(object):
 				index = index + 1
 		
 		return features
+
+
+
+def main():
+	enviroment = MountainCar(1)
+	print(enviroment.getState())
+
+
+if __name__ == '__main__':
+	main()
