@@ -21,6 +21,7 @@ class GridWorld(object):
 		self.is_episode_over = False
 
 		self.probability_distribution_vector = [0.8, 0.1, 0.05, 0.05]
+		self.action_set = ['top', 'bottom', 'left', 'right']
 
 	'''
 	Returns if the episode has terminated or not
@@ -28,13 +29,21 @@ class GridWorld(object):
 	def isEpisodeOver(self):
 		return self.is_episode_over
 
+	def getActions(self):
+		return self.action_set
+
 	'''
 	Returns the current state of the agent
 	'''
 	def getState(self):
 		return self.current_state
 
-	def update_state(self, action):
+	def getReward(self, current_state, action, next_state):
+		if current_state[0] == self.max_grid_size and current_state[1] == self.max_grid_size:
+			return 0
+		return self.reward[next_state[0], next_state[1]]
+
+	def updateState(self, action):
 		self.current_state = self.update_state_internal(self.current_state[0], self.current_state[1], action)
 		if self.current_state[0] == self.max_grid_size and self.current_state[1] == self.max_grid_size:
 			self.is_episode_over = True
@@ -113,6 +122,23 @@ class GridWorld(object):
 				return pos_dictionary['left']
 			else:
 				return pos_dictionary['right']
+
+	def getFeatures(self, state, action):
+		features = np.zeros(len(self.action_set) * (self.max_grid_size + 1) * (self.max_grid_size + 1))
+		# for the terminal state the feature vector will be zero
+		if state[0] == self.max_grid_size and state[1] == self.max_grid_size:
+			return features
+		index = 0
+		if action == self.action_set[1]:
+			index = (self.max_grid_size + 1) * (self.max_grid_size + 1)
+		elif action == self.action_set[2]:
+			index = 2 * (self.max_grid_size + 1) * (self.max_grid_size + 1)
+		elif action == self.action_set[3]:
+			index = 3 * (self.max_grid_size + 1) * (self.max_grid_size + 1)
+
+		index = index + state[0] * (self.max_grid_size + 1) + state[1]
+		features[index] = 1
+		return features
 
 
 

@@ -8,7 +8,7 @@ import time
 
 class MountainCar(object):
 	"""docstring for Environment"""
-	def __init__(self):
+	def __init__(self, fourier_order):
 		self.car_position = -0.5
 		self.car_velocity = 0
 		self.velocity_lower_bound = -0.07
@@ -19,6 +19,12 @@ class MountainCar(object):
 		self.max_time_steps = 20000
 		self.current_time_step = 0
 
+		self.action_set = [1, 0, -1]
+		self.reward = reward
+		
+		self.fourier_order = fourier_order
+		#self.weights = np.zeros(len(self.action_set) * (self.fourier_order + 1) * (self.fourier_order + 1))
+
 	def isEpisodeOver(self):
 		if self.current_time_step >= self.max_time_steps:
 			return True
@@ -26,6 +32,14 @@ class MountainCar(object):
 
 	def getState(self):
 		return (self.car_position, self.car_velocity)
+
+	def getActions(self):
+		return self.action_set
+
+	def getReward(self, current_state, action, next_state):
+		if current_state[0] == self.terminal_position:
+			return 0
+		return -1
 
 
 	def updateState(self, current_action):
@@ -54,3 +68,24 @@ class MountainCar(object):
 
 		#return the state of the environment
 		return (self.car_position, self.car_velocity)
+
+
+	def getFeatures(self, state, action):
+		if state[0] == self.terminal_position:
+			return np.zeros(len(self.action_set) * (self.fourier_order + 1) * (self.fourier_order + 1))
+		features = np.zeros(len(self.action_set) * (self.fourier_order + 1) * (self.fourier_order + 1))
+		index = 0
+		if action == 0:
+			index = (self.fourier_order + 1) * (self.fourier_order + 1)
+		elif action == -1:
+			index = 2 * (self.fourier_order + 1) * (self.fourier_order + 1)
+
+		new_pos = (1.2 + state[0])/ 1.7
+		new_vel = (0.07 + state[1]) / 0.14
+		
+		for c_1 in xrange(self.fourier_order + 1):
+			for c_2 in xrange(self.fourier_order + 1):
+				features[index] = math.cos(math.pi * ( c_1 * new_pos + c_2 * new_vel))
+				index = index + 1
+		
+		return features
