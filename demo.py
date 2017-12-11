@@ -28,7 +28,9 @@ def runTrials(trials, episode_count):
 	plt.xlabel('episode count')
 	plt.ylabel('mean returns')
 	plt.errorbar(episode_list, mean_returns, std_dev)
-	plt.title('Residual mean returns plot with standard deviation as error bars')
+	environment_string = 'Grid World' if config.ENVIRONMENT == config.EnvironmentType.GRIDWORLD else 'Mountain Car'
+	training_string = 'epoch mode' if config.TRAINING_TYPE == config.TrainingMode.EPOCH else 'incremental mode'
+	plt.title('Residual Algorithm mean returns plot with standard deviation as error bars for ' + environment_string + ' domain in ' + training_string)
 	plt.show()
 
 		

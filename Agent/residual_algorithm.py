@@ -139,7 +139,7 @@ class ResidualAlgorithm(object):
 				
 				if self.training_mode == config.TrainingMode.INCREMENTAL:
 					phi = self.compute_phi_incremental_mode(current_features, reward, next_features_list)
-					#phi = 0 # to test the algorithm in direct gradient and residual gradient scenarios in incremental mode
+					#phi = 1 # to test the algorithm in direct gradient and residual gradient scenarios in incremental mode
 					self.perform_weight_update(current_features, reward, next_features_list, phi)
 				else:
 					transition_list.append([current_features, reward, next_features_list])
