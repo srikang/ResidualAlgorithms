@@ -2,31 +2,28 @@ import os
 import sys
 import math
 import numpy as np
-from threading import Thread
-from matplotlib import pyplot as plt
-import time
 
 class MountainCar(object):
-	"""docstring for Environment"""
-	def __init__(self, fourier_order):
+	def __init__(self, fourier_order, max_time_step):
 		self.car_position = -0.5
 		self.car_velocity = 0
 		self.velocity_lower_bound = -0.07
 		self.velocity_upper_bound = 0.07
 		self.position_lower_bound = -1.2
 		self.position_upper_bound = 0.5
-
-		self.max_time_steps = 20000
+		self.terminal_position = self.position_upper_bound
+		self.max_time_steps = max_time_step
 		self.current_time_step = 0
-
 		self.action_set = [1, 0, -1]
-		self.reward = reward
-		
 		self.fourier_order = fourier_order
-		#self.weights = np.zeros(len(self.action_set) * (self.fourier_order + 1) * (self.fourier_order + 1))
 
 	def isEpisodeOver(self):
 		if self.current_time_step >= self.max_time_steps:
+			return True
+		return False
+
+	def isTerminalState(self, state):
+		if state[0] == self.terminal_position:
 			return True
 		return False
 
@@ -59,7 +56,6 @@ class MountainCar(object):
 			temp_position = self.position_upper_bound
 
 		#compute the updated car position
-
 		self.car_position = temp_position
 		self.car_velocity = temp_velocity
 
@@ -89,7 +85,6 @@ class MountainCar(object):
 				index = index + 1
 		
 		return features
-
 
 
 def main():

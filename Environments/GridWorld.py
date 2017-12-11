@@ -3,8 +3,7 @@ import sys
 import numpy as np
 
 class GridWorld(object):
-	"""docstring for ValueIteration"""
-	def __init__(self, start_state):
+	def __init__(self, start_state, max_time_step):
 		self.layout = np.zeros((5,5))
 		self.layout[2,2] = 1
 		self.layout[3,2] = 1
@@ -13,21 +12,27 @@ class GridWorld(object):
 		self.reward[4,4] = 10
 		self.reward[4,2] = -10
 
-
-		self.value_matrix = np.zeros((5,5))
-
 		self.max_grid_size = 4
 		self.current_state = start_state
-		self.is_episode_over = False
 
 		self.probability_distribution_vector = [0.8, 0.1, 0.05, 0.05]
 		self.action_set = ['top', 'bottom', 'left', 'right']
+
+		self.current_time_step = 0
+		self.max_time_step = max_time_step
 
 	'''
 	Returns if the episode has terminated or not
 	'''
 	def isEpisodeOver(self):
-		return self.is_episode_over
+		if self.current_time_step >= self.max_time_step:
+			return True
+		return False
+
+	def isTerminalState(self, state):
+		if self.current_state[0] == self.max_grid_size and self.current_state[1] == self.max_grid_size:
+			return True
+		return False
 
 	def getActions(self):
 		return self.action_set
@@ -45,15 +50,11 @@ class GridWorld(object):
 
 	def updateState(self, action):
 		self.current_state = self.update_state_internal(self.current_state[0], self.current_state[1], action)
-		if self.current_state[0] == self.max_grid_size and self.current_state[1] == self.max_grid_size:
-			self.is_episode_over = True
+		self.current_time_step += 1
 		return self.current_state
 
 
 	def update_state_internal(self, row_index, column_index, action):
-		if self.layout[row_index,column_index] == 1:
-			return (-1, -1) #invalid state
-
 		if row_index == self.max_grid_size and column_index == self.max_grid_size:
 			return self.current_state
 
@@ -77,11 +78,7 @@ class GridWorld(object):
 			if pos_dictionary.has_key(key) == False:
 				pos_dictionary[key] = (row_index, column_index)
 
-		print(pos_dictionary)
-
-
 		effective_action = np.random.choice(4, 1, p = self.probability_distribution_vector)[0]
-		print effective_action
 
 		if action == 'right':
 			if effective_action == 0:
@@ -141,7 +138,7 @@ class GridWorld(object):
 		return features
 
 
-
+'''
 if __name__ == '__main__':
 	environment = GridWorld((4,3))
 	# running few tests to ensure that the environment matches the specified criteria
@@ -151,9 +148,9 @@ if __name__ == '__main__':
 
 	#print environment.update_state_internal(4, 3, 'right') # test for episode termination
 
-	print environment.update_state('right')
+	print environment.updateState('right')
 
 	print environment.isEpisodeOver()
 
 	#print environment.update_state_internal(2, 1, 'right') # test for avoiding invalid states
-
+'''
